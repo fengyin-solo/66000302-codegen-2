@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { FEAModel, FEAResult } from '../types';
+import type { CaseBundle } from '../types/case-archive';
 import {
   solve as feaSolve,
   presetCantileverBeam,
@@ -8,6 +9,7 @@ import {
   presetSimpleFrame,
   jetColormap,
 } from '../utils/fea-solver';
+import { deepClone } from '../utils/case-utils';
 
 export const useFEAStore = defineStore('fea', () => {
   const model = ref<FEAModel>({ nodes: [], elements: [], loads: [] });
@@ -40,6 +42,20 @@ export const useFEAStore = defineStore('fea', () => {
 
   function solve() {
     result.value = feaSolve(model.value);
+  }
+
+  /** 从归档算例包还原模型、结果与视图设置 */
+  function loadCase(bundle: CaseBundle) {
+    const { content } = bundle;
+    if (content.model) {
+      model.value = deepClone(content.model);
+    }
+    result.value = content.result ? deepClone(content.result) : null;
+    selectedElement.value = null;
+    selectedPreset.value = content.settings.preset || 'archive';
+    heatmapMode.value = content.settings.heatmapMode || 'stress';
+    showDeformed.value = !!content.settings.showDeformed;
+    deformationScale.value = content.settings.deformationScale ?? 10;
   }
 
   function toggleDeformed() {
@@ -123,6 +139,7 @@ export const useFEAStore = defineStore('fea', () => {
     elementColors,
     loadPreset,
     solve,
+    loadCase,
     toggleDeformed,
     selectElement,
     setHeatmapMode,
