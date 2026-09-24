@@ -3,12 +3,17 @@ import { onMounted } from 'vue';
 import FEACanvas from './components/FEACanvas.vue';
 import ElementInfo from './components/ElementInfo.vue';
 import MeshControls from './components/MeshControls.vue';
+import CaseExport from './components/CaseExport.vue';
+import CaseArchive from './components/CaseArchive.vue';
 import { useFEAStore } from './store/fea';
+import { useCaseStore } from './store/case';
 
 const store = useFEAStore();
+const caseStore = useCaseStore();
 
 onMounted(() => {
   store.loadPreset('cantilever');
+  caseStore.refreshCases();
 });
 </script>
 
@@ -33,9 +38,11 @@ onMounted(() => {
       </div>
 
       <!-- Right sidebar -->
-      <div class="w-[25%] min-w-[260px] bg-slate-900 border-l border-slate-800 p-3 flex flex-col gap-3 overflow-y-auto">
+      <div class="w-[25%] min-w-[280px] bg-slate-900 border-l border-slate-800 p-3 flex flex-col gap-3 overflow-y-auto">
         <MeshControls />
         <ElementInfo />
+        <CaseExport />
+        <CaseArchive />
       </div>
     </div>
 
